@@ -117,7 +117,7 @@ def df_lp_mt_de_uma_turma(cd_turma: str) -> pd.DataFrame:
     return pd.DataFrame(linhas)
 
 # streamlit
-st.set_page_config(page_title="Gráfico 3 — Destaque (apenas 2025)", layout="wide")
+st.set_page_config(page_title="Gráfico 3 - Destaque (apenas 2025)", layout="wide")
 
 st.title("Gráfico 3 — Destaque por escola/turma (apenas 2025)")
 st.caption("Cada barra representa a **média de TX_ACERTOS (%)** em **Língua Portuguesa** e **Matemática** no recorte escolhido.")

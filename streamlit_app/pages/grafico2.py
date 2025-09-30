@@ -74,6 +74,7 @@ df_analises = df_analises.sort_values(["NM_ENTIDADE", "CICLO"]).reset_index(drop
 
 
 # streamlit interface
+st.set_page_config(page_title="Gráfico 2 - Tabela de Desempenho dos Alunos", layout="wide")
 st.title("Resultados de Matemática - Encanto (2025)")
 
 st.subheader("Tabela do Ciclo 1 (AV12025)")
