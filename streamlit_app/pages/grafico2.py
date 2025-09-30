@@ -186,6 +186,89 @@ st.dataframe(
     use_container_width=True
 )
 
+# ================== ANÁLISE DE HABILIDADES (DC_PONTUACAO) ==================
+st.subheader("📊 Comparativo de Habilidades da Turma (Ciclo 1 × Ciclo 2)")
+
+# Contagem de alunos por nível de desempenho
+dist_c1 = df_c1["DC_PONTUACAO"].value_counts().rename_axis("Nível").reset_index(name="Qtd")
+dist_c1["Ciclo"] = "C1"
+
+dist_c2 = df_c2["DC_PONTUACAO"].value_counts().rename_axis("Nível").reset_index(name="Qtd")
+dist_c2["Ciclo"] = "C2"
+
+# Junta os dois ciclos
+df_habilidades = pd.concat([dist_c1, dist_c2], ignore_index=True)
+
+# Gráfico horizontal
+fig_hab = px.bar(
+    df_habilidades,
+    x="Qtd", y="Nível",
+    color="Ciclo", barmode="group",
+    orientation="h",
+    color_discrete_map={"C1": "#1f77b4", "C2": "#ff7f0e"},  # azul e laranja
+    title="Distribuição dos Níveis de Aprendizagem (C1 × C2)"
+)
+
+# Rótulos visíveis
+fig_hab.update_traces(
+    texttemplate="%{x}",
+    textposition="outside",
+    cliponaxis=False
+)
+
+fig_hab.update_layout(
+    xaxis_title="Quantidade de Alunos",
+    yaxis_title="Nível de Aprendizagem",
+    margin=dict(l=120, r=40, t=60, b=40)
+)
+
+st.plotly_chart(fig_hab, use_container_width=True)
 
 
 
+# ================== COMPARATIVO DE HABILIDADES POR ALUNO ==================
+st.subheader("📊 Comparativo de Habilidades por Aluno (Ciclo 1 × Ciclo 2)")
+
+# Mapeia níveis para valores numéricos (para ordenar no gráfico)
+map_niveis = {"Defasagem": 1, "Intermediário": 2, "Adequado": 3}
+inv_map = {v: k for k, v in map_niveis.items()}  # para mostrar depois
+
+df_aluno_nivel = df_analises[["NM_ENTIDADE","CICLO","DC_PONTUACAO"]].copy()
+df_aluno_nivel["Nivel_Num"] = df_aluno_nivel["DC_PONTUACAO"].map(map_niveis)
+
+# Remove alunos sem pontuação definida
+df_aluno_nivel = df_aluno_nivel.dropna(subset=["Nivel_Num"])
+
+# Ordena os alunos alfabeticamente
+ordem_alunos = df_aluno_nivel["NM_ENTIDADE"].unique().tolist()
+
+# Gráfico horizontal
+fig_aluno_nivel = px.bar(
+    df_aluno_nivel,
+    x="Nivel_Num", y="NM_ENTIDADE",
+    color="CICLO", barmode="group",
+    orientation="h",
+    category_orders={"NM_ENTIDADE": ordem_alunos},
+    color_discrete_map={"C1": "#1f77b4", "C2": "#ff7f0e"},
+    title="Evolução do Nível de Aprendizagem por Aluno (C1 × C2)"
+)
+
+# Substitui os números pelos nomes dos níveis
+fig_aluno_nivel.update_traces(
+    text=df_aluno_nivel["DC_PONTUACAO"],
+    textposition="outside"
+)
+
+fig_aluno_nivel.update_layout(
+    xaxis=dict(
+        tickmode="array",
+        tickvals=[1,2,3],
+        ticktext=["Defasagem","Intermediário","Adequado"],
+        range=[0,3.8]
+    ),
+    yaxis_title="Aluno",
+    xaxis_title="Nível de Aprendizagem",
+    margin=dict(l=180, r=40, t=60, b=40)
+)
+
+st.plotly_chart(fig_aluno_nivel, use_container_width=True)
